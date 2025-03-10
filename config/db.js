@@ -1,10 +1,10 @@
 const mysql = require('mysql2/promise');
 let conn
 const options = {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASS || '',
-    database: process.env.DB_NAME || 'test',
+    host: process.env.DB_HOST || 'https://bolsta.nyraleadership.com',
+    user: process.env.DB_USER || 'bolsta',
+    password: process.env.DB_PASS || 'bolsta089',
+    database: process.env.DB_NAME || 'Test',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
