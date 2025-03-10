@@ -1,0 +1,15 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "SafeDispatchLogistics",
+        "version": "1.0.0",
+        "description": "API Documentation for SafeDispatchLogistics API"
+    },
+    "servers": [
+        {
+            "url": "https://backend.safedispatchlogistics.com",
+            "description": "Backend Server"
+        }
+    ],
+    "paths": {}
+}
