@@ -1,0 +1,55 @@
+CREATE TABLE Roles (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    role_name VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE plans (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    type VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE companies (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    company_name VARCHAR(255) NOT NULL,
+    primary_admin_name VARCHAR(255) NOT NULL,
+    primary_admin_email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    plan_type BIGINT UNSIGNED,  
+    subscribers_count INT DEFAULT 0,
+    videos_per_subscriber INT DEFAULT 0,
+    FOREIGN KEY (plan_type) REFERENCES plans(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+
+CREATE TABLE students (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    company_id BIGINT UNSIGNED,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE user (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role BIGINT UNSIGNED NOT NULL,
+    student_id BIGINT UNSIGNED DEFAULT NULL,
+    company_id BIGINT UNSIGNED DEFAULT NULL,
+    FOREIGN KEY (role) REFERENCES Roles(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE videos (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    uploaded_by BIGINT UNSIGNED NOT NULL,
+    video_type VARCHAR(50),
+    ETag VARCHAR(255),
+    ServerSideEncryption VARCHAR(50),
+    Location VARCHAR(500),
+    `Key` VARCHAR(255),
+    Bucket VARCHAR(255),
+    FOREIGN KEY (uploaded_by) REFERENCES user(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+SET foreign_key_checks = 1;

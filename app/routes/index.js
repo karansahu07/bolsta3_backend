@@ -1,5 +1,6 @@
 const utils = require('../../utils');
 const userRoutes = require('./UserRoute');
+const superAdminRoutes = require("./superadminroute");
 
 const router = require('express').Router();
 router.get('/admin', async(req, res, next)=>{
@@ -10,7 +11,7 @@ router.get('/admin', async(req, res, next)=>{
         next(error);
     }
 })
-
+router.use("/superadmin", superAdminRoutes);
 router.use('/user', userRoutes)
 
 module.exports=router;

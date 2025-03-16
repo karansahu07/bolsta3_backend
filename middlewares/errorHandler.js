@@ -25,6 +25,60 @@ const errorHandler = (err, req, res, next) => {
     error.isOperational = true;
   }
 
+  if (err.code) {
+    switch (err.code) {
+      case "ER_DUP_ENTRY":
+        error.statusCode = 400;
+        error.message = "Duplicate entry. The value already exists.";
+        error.isOperational = true;
+        break;
+
+      case "ER_BAD_NULL_ERROR":
+        error.statusCode = 400;
+        error.message = "Missing required fields.";
+        error.isOperational = true;
+        break;
+
+      case "ER_NO_REFERENCED_ROW_2":
+        error.statusCode = 400;
+        error.message = "Foreign key constraint failed.";
+        error.isOperational = true;
+        break;
+
+      case "ER_DATA_TOO_LONG":
+        error.statusCode = 400;
+        error.message = "Data exceeds the maximum allowed length.";
+        error.isOperational = true;
+        break;
+
+      case "ER_PARSE_ERROR":
+        error.statusCode = 400;
+        error.message = "Invalid SQL syntax.";
+        error.isOperational = false;
+        break;
+
+      case "ER_ACCESS_DENIED_ERROR":
+        error.statusCode = 403;
+        error.message = "Database access denied.";
+        error.isOperational = false;
+        break;
+
+      case "ER_LOCK_WAIT_TIMEOUT":
+        error.statusCode = 408;
+        error.message = "Database lock wait timeout exceeded.";
+        error.isOperational = false;
+        break;
+
+      case "PROTOCOL_CONNECTION_LOST":
+      case "ECONNREFUSED":
+      case "ER_CON_COUNT_ERROR":
+        error.statusCode = 503;
+        error.message = "Database connection error. Please try again.";
+        error.isOperational = false;
+        break;
+    }
+  }
+
   // Handle Invalid ObjectId Errors (e.g., when querying by an invalid MongoDB ID)
   if (err.name === "CastError") {
     error.statusCode = 400;

@@ -4,5 +4,5 @@ module.exports = {
     db:require('./db'),
     httpCodes:require('./httpCodes'),
     httpStatus:require('./httpStatus'),
-    swagger:require('./swaggerConfig'),
+    // swagger:require('./swaggerConfig'),
 }
