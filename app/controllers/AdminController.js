@@ -1,25 +1,25 @@
 const bcrypt = require("bcrypt");
-const { addCompany } = require("../queries/SuperAdminQueries");
+const { addPerson } = require("../queries/AdminQueries");
 const utils = require("../../utils");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
-exports.createCompany = async (details) => {
+exports.createPerson = async (details) => {
   try {
-    const { company_name, admin_name, admin_email, password, plan_type, subscribers, videos_per_subscriber } = details;
+    const { name, email_id } = details;
 
     // Generate a random password if not provided
     const generatedPassword = password || crypto.randomBytes(8).toString("hex"); // 16-character random password
 
     console.log("Generated Password:", generatedPassword); // Log for reference
 
-    const companyData = [company_name, admin_name, admin_email, generatedPassword, plan_type, subscribers, videos_per_subscriber];
+    const personData = [name, email_id, generatedPassword];
 
     // Insert into Database
-    const result = await addCompany(companyData);
+    const result = await addPerson(personData);
     console.log("In controller", result);
 
-    await sendEmail(admin_email, generatedPassword);
+    await sendEmail(email_id, generatedPassword);
 
     return { result, generatedPassword }; // Return password for further use
 
