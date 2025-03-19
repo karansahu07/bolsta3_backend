@@ -52,4 +52,13 @@ CREATE TABLE videos (
     FOREIGN KEY (uploaded_by) REFERENCES user(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    email VARCHAR(100) UNIQUE,
+    password VARCHAR(255),
+    role ENUM('superadmin', 'admin', 'student'),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 SET foreign_key_checks = 1;
