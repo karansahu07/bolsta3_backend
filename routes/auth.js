@@ -5,12 +5,15 @@ const bcrypt = require('bcrypt');
 const router = express.Router();  // Ensure you're using this router
 
 // Post route for login
-router.post('/login', async (req, res) => {
+router.post('/auth/login', async (req, res) => {
     const { email, password } = req.body;
     console.log(email);
     console.log(password);
-    
-    const sql = "SELECT * FROM users WHERE email = ?";
+
+    const sql = `SELECT users.id, users.Email, users.password, Role.type AS role 
+FROM users 
+JOIN Role ON users.role = Role.id 
+WHERE users.Email = ?`;
     db.query(sql, [email], async (err, result) => {
         console.log(result)
         if (err) {
@@ -18,7 +21,7 @@ router.post('/login', async (req, res) => {
         }
 
         if (result.length == 0) {
-            
+
             return res.status(401).json({ message: "Invalid Credentials" });
         }
 
@@ -30,8 +33,16 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: "Invalid Credentials" });
         }
 
-        res.json({ message: "Login Successful", role: user.role });
+        res.status(200).json({ message: "Login Successful", user:{email: user.Email, role: user.role, homeRoute: gethomeRoute(user.role)} });
     });
 });
 
-module.exports = router;  // Export the router with the '/login' route
+const gethomeRoute = (role) =>{
+    switch(role){
+        case "superadmin" : return "/superdashboard"
+        case "admin" : return "/dashboard"         
+        case "student" : return "/practice"
+    }
+}
+
+module.exports = router;  
