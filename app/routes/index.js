@@ -1,6 +1,7 @@
 const utils = require("../../utils");
 const controllers = require("../controllers");
 const userRoutes = require("./UserRoute");
+const authRoutes = require("./auth");
 const superAdminRoutes = require("./superadminroute");
 
 const router = require("express").Router();
@@ -43,7 +44,9 @@ router
       next(error);
     }
   });
+
 router.use("/superadmin", superAdminRoutes);
 router.use("/user", userRoutes);
+router.use("/auth", authRoutes);
 
 module.exports = router;

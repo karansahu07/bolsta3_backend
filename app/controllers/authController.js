@@ -1,21 +1,28 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const db = require('../../config/db');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { pool } = require("../../config/db");
+const utils = require("../../utils");
 
-exports.login = (req, res) => {
-    const { email, password } = req.body;
-    
-    db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
-        if (err) return res.status(500).json({ error: "Database Error" });
-        if (results.length === 0) return res.status(401).json({ error: "Invalid Credentials" });
+const login = async ({ email, password }) => {
+  const query = `SELECT users.id AS userId, users.name AS userName, users.email, users.password, roles.role_name AS role 
+    FROM users 
+    JOIN roles ON users.role = roles.id 
+    WHERE users.Email = ?`;
+  const [result] = await pool.query(query, [email]);
+  if (result.length <= 0) throw new utils.ApiError("Invalid email", 401);
+  const user = result[0];
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw new utils.ApiError("Invalid password", 401);
+  const token = await jwt.sign(
+    { id: user.id, role: user.role },
+    process.env.JWT_KEY,
+    {
+      expiresIn: "5h",
+    }
+  );
+  return { token, user: { userName: user.userName, email, role: user.role } };
+};
 
-        const user = results[0];
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) return res.status(401).json({ error: "Invalid Credentials" });
-
-        const token = jwt.sign({ id: user.id, role: user.role }, 'your_secret_key', { expiresIn: '1h' });
-
-        res.json({ message: "Login Successful", token, role: user.role });
-    });
+module.exports = {
+  login,
 };

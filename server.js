@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const authRoutes = require("./routes/auth"); // Make sure this points to the correct auth file
 const middlewares = require("./middlewares");
 const router = require("./app/routes");
 const config = require("./config");
