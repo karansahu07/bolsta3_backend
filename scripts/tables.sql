@@ -1,3 +1,4 @@
+-- Active: 1742485368825@@127.0.0.1@3306@bolsta
 CREATE TABLE Roles (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     role_name VARCHAR(50) NOT NULL UNIQUE
@@ -13,7 +14,6 @@ CREATE TABLE companies (
     company_name VARCHAR(255) NOT NULL,
     primary_admin_name VARCHAR(255) NOT NULL,
     primary_admin_email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
     plan_type BIGINT UNSIGNED,  
     subscribers_count INT DEFAULT 0,
     videos_per_subscriber INT DEFAULT 0,
@@ -28,10 +28,10 @@ CREATE TABLE students (
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE TABLE user (
+CREATE TABLE users (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255),
     email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
     role BIGINT UNSIGNED NOT NULL,
     student_id BIGINT UNSIGNED DEFAULT NULL,
     company_id BIGINT UNSIGNED DEFAULT NULL,

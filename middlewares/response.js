@@ -1,36 +1,5 @@
 const APIResponse = require("../utils/apiResponse");
 const httpStatus = require("../config/httpStatus");
-
-const sendResponseMiddleware = (req, res, next) => {
-  const originalSend = res.send;
-  /**
-   * Custom send method for standardized responses.
-   *
-   * @param {number} statusCode - The HTTP status code.
-   * @param {string} [msg] - The message to send.
-   * @param {Object} [data] - The data to send.
-   */
-  res.send = function (statusCode, data, msg) {
-    if (typeof statusCode !== "number") {
-      return originalSend.call(this, statusCode);
-    }
-
-    const httpRes = httpStatus[`${statusCode}`];
-    const resp = {
-      code: statusCode,
-      msg: msg ?? httpRes.message,
-    };
-    if (data) {
-      resp.data = data ?? [];
-    }
-
-    this.status(statusCode).json(resp);
-  };
-
-  next();
-};
-
-
 /**
  * @typedef {import("express").Response & { apiResponse: (statusCode: number, message?: string, data?: object, meta?: object) => void }} CustomResponse
  */
@@ -64,4 +33,4 @@ const apiResponseMiddleware = (req, res, next) => {
   next();
 };
 
-module.exports = { apiResponseMiddleware, apiResponseMiddleware };
+module.exports = apiResponseMiddleware

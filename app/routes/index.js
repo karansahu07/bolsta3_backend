@@ -1,17 +1,49 @@
-const utils = require('../../utils');
-const userRoutes = require('./UserRoute');
+const utils = require("../../utils");
+const controllers = require("../controllers");
+const userRoutes = require("./UserRoute");
 const superAdminRoutes = require("./superadminroute");
 
-const router = require('express').Router();
-router.get('/admin', async(req, res, next)=>{
-    try {
-        res.apiResponse(200, 'working', [1,2,3])
-    //    throw new utils.ApiError('this route is working', 400)
-    } catch (error) {
-        next(error);
-    }
-})
-router.use("/superadmin", superAdminRoutes);
-router.use('/user', userRoutes)
+const router = require("express").Router();
 
-module.exports=router;
+router
+  .route("/company")
+  .post(async (req, res, next) => {
+    try {
+      const {
+        companyName,
+        adminName,
+        adminEmail,
+        planType,
+        subscribers,
+        videosPerSubscriber,
+      } = req.body;
+      const result = await controllers.superAdmin.createCompany({
+        companyName,
+        adminName,
+        adminEmail,
+        planType,
+        subscribers,
+        videosPerSubscriber,
+      });
+      if (result.companyResult.affectedRows > 0)
+        res.apiResponse(200, null, result);
+    } catch (error) {
+      next(error);
+    }
+  })
+  .get(async (req, res, next) => {
+    try {
+      const { page, limit } = req.query;
+      const companies = await controllers.superAdmin.getCompaniesWithUsers(
+        page,
+        limit
+      );
+      res.apiResponse(200, null, companies.data, companies.pagination);
+    } catch (error) {
+      next(error);
+    }
+  });
+router.use("/superadmin", superAdminRoutes);
+router.use("/user", userRoutes);
+
+module.exports = router;
