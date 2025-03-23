@@ -6,9 +6,8 @@ const superAdminRoutes = require("./superAdminRoutes");
 
 const router = require("express").Router();
 
-router.use("/", superAdminRoutes);
-
-router.use("/user", userRoutes);
 router.use("/auth", authRoutes);
+router.use("/user", userRoutes);
+router.use("/su", superAdminRoutes);
 
 module.exports = router;

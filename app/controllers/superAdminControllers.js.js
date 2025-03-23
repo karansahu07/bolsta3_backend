@@ -3,6 +3,7 @@ const utils = require("../../utils");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const { pool } = require("../../config/db");
+const addEmailToQueue = require("../../services/mailQueue");
 
 const createCompany = async (companyDetails) => {
   const connection = await pool.getConnection(); // Get a DB connection
@@ -14,31 +15,33 @@ const createCompany = async (companyDetails) => {
       adminName,
       adminEmail,
       planType,
+      planCount,
       subscribers,
       videosPerSubscriber,
+      videoTime,
+      createdBy,
     } = companyDetails;
 
     const plainPassword = crypto.randomBytes(8).toString("hex"); // Generate a random password
     console.log("plain password:", plainPassword);
     const passwordHash = await bcrypt.hash(plainPassword, 10); // Hash password
-
     // Insert company data
-    const companyQuery = `INSERT INTO companies (company_name, primary_admin_name, primary_admin_email, plan_type, subscribers_count, videos_per_subscriber) 
-                          VALUES (?, ?, ?, ?, ?, ?)`;
+    const companyQuery = `INSERT INTO companies (company_name, primary_admin_name, primary_admin_email, plan_type, plan_count, subscribers_count, videos_per_subscriber, video_time, created_by) 
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const [companyResult] = await connection.query(companyQuery, [
       companyName,
       adminName,
       adminEmail,
       planType == "monthly" ? 1 : 2,
+      planCount,
       subscribers,
       videosPerSubscriber,
+      videoTime,
+      createdBy,
     ]);
 
-    // Get the inserted company's ID
-    console.log(companyDetails);
     const companyId = companyResult.insertId;
-
     // Insert user data
     const userQuery = `INSERT INTO users (name, email, password, role, company_id) VALUES (?, ?, ?, 2, ?)`;
 
@@ -48,9 +51,16 @@ const createCompany = async (companyDetails) => {
       passwordHash,
       companyId, // Use the actual inserted company ID
     ]);
-
     // Commit the transaction
     await connection.commit();
+    //sending mail 
+    const templatter = utils.templates("welcome");
+    const html = await templatter({
+      companyName: "Bolsta",
+      adminEmail,
+      password: plainPassword,
+    });
+    addEmailToQueue(adminEmail, "Bolsta onboarding", html);
 
     return { companyResult, userResult }; // Return the result of both insertions
   } catch (error) {

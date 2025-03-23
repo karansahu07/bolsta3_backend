@@ -29,7 +29,7 @@ const errorHandler = (err, req, res, next) => {
     switch (err.code) {
       case "ER_DUP_ENTRY":
         error.statusCode = 400;
-        error.message = "Duplicate entry. The value already exists.";
+        error.message = "Duplicate entry. The value already exists." || error.sqlMessage;
         error.isOperational = true;
         break;
 

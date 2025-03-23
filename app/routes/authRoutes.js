@@ -1,9 +1,9 @@
 const express = require("express");
-const { login } = require("../controllers/authController");
 const controllers = require("../controllers");
 const utils = require("../../utils");
 const middlewares = require("../../middlewares");
 const authRoutes = express.Router();
+
 const gethomeRoute = (role) => {
   switch (role) {
     case "superadmin":
@@ -28,6 +28,7 @@ authRoutes.post("/login", async (req, res, next) => {
     next(error);
   }
 });
+
 authRoutes.get("/logout", middlewares.auth, async (req, res, next) => {
   try {
     res.clearCookie("token");
@@ -36,6 +37,7 @@ authRoutes.get("/logout", middlewares.auth, async (req, res, next) => {
     next(error);
   }
 });
+
 authRoutes.get("/profile", middlewares.auth, async (req, res, next) => {
   try {
     const userId = req.auth.userId;
