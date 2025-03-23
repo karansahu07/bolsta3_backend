@@ -3,12 +3,14 @@ const cors = require("cors");
 const middlewares = require("./middlewares");
 const router = require("./app/routes");
 const config = require("./config");
+const cookieParser = require("cookie-parser")
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(config.cors));
+app.use(cookieParser())
 app.use(middlewares.reqLogger);
 app.use(middlewares.response);
 app.use("/api", router); // Register the routes

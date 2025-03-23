@@ -1,5 +1,5 @@
 module.exports = {
-  admin: require("./AdminController"),
-  superAdmin: require("./SuperAdminController"),
+  admin: require("./adminControllers.js"),
+  superAdmin: require("./superAdminControllers.js"),
   auth: require("./authController"),
 };
