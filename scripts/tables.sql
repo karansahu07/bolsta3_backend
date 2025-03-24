@@ -1,8 +1,112 @@
+-- Active: 1742116665600@@127.0.0.1@3306@bolsta
+-- -- Disable foreign key constraints temporarily
+-- SET foreign_key_checks = 0;
+
+-- -- Creating Roles Table
+-- CREATE TABLE roles (
+--     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+--     role_name VARCHAR(50) NOT NULL UNIQUE,
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+-- ) ENGINE=InnoDB;
+
+-- -- Creating Plans Table
+-- CREATE TABLE plans (
+--     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+--     type VARCHAR(50) NOT NULL UNIQUE,
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+-- ) ENGINE=InnoDB;
+
+-- -- Creating Users Table
+-- CREATE TABLE users (
+--     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+--     name VARCHAR(255) NOT NULL,
+--     email VARCHAR(255) NOT NULL UNIQUE,
+--     password VARCHAR(255) NOT NULL,
+--     role BIGINT UNSIGNED NOT NULL,
+--     student_id BIGINT UNSIGNED DEFAULT NULL,
+--     company_id BIGINT UNSIGNED DEFAULT NULL,
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--     FOREIGN KEY (role) REFERENCES roles(id) ON DELETE CASCADE,
+--     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
+--     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+-- ) ENGINE=InnoDB;
+
+-- -- Creating Companies Table
+-- CREATE TABLE companies (
+--     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+--     company_name VARCHAR(255) NOT NULL,
+--     primary_admin_name VARCHAR(255) NOT NULL,
+--     primary_admin_email VARCHAR(255) NOT NULL UNIQUE,
+--     plan_type BIGINT UNSIGNED,  
+--     plan_count BIGINT UNSIGNED DEFAULT 0,
+--     subscribers_count INT DEFAULT 0,
+--     videos_per_subscriber INT DEFAULT 0,
+--     video_time INT DEFAULT 0,
+--     created_by BIGINT UNSIGNED NOT NULL,
+--     updated_by BIGINT UNSIGNED DEFAULT NULL,
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--     FOREIGN KEY (plan_type) REFERENCES plans(id) ON DELETE SET NULL,
+--     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
+--     FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+-- ) ENGINE=InnoDB;
+
+-- -- Creating Students Table
+-- CREATE TABLE students (
+--     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+--     name VARCHAR(255) NOT NULL,
+--     company_id BIGINT UNSIGNED NOT NULL,
+--     created_by BIGINT UNSIGNED NOT NULL,
+--     updated_by BIGINT UNSIGNED DEFAULT NULL,
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+--     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
+--     FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+-- ) ENGINE=InnoDB;
+
+-- -- Creating Videos Table
+-- CREATE TABLE videos (
+--     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+--     uploaded_by BIGINT UNSIGNED NOT NULL,
+--     video_type VARCHAR(50),
+--     ETag VARCHAR(255),
+--     ServerSideEncryption VARCHAR(50),
+--     Location VARCHAR(500),
+--     `Key` VARCHAR(255),
+--     Bucket VARCHAR(255),
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--     FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE CASCADE
+-- ) ENGINE=InnoDB;
+
+-- -- Insert predefined roles
+-- INSERT INTO roles (role_name) VALUES 
+-- ('superadmin'),
+-- ('admin'),
+-- ('student');
+
+-- -- Insert predefined plans
+-- INSERT INTO plans (type) VALUES 
+-- ('monthly'),
+-- ('annually');
+
+-- -- Create a default SuperAdmin user
+-- INSERT INTO users (name, email, password, role) VALUES 
+-- ('Super Admin', 'superadmin@bolsta.com', SHA2('SuperAdmin123!', 256), 1);
+
+-- -- Enable foreign key constraints again
+-- SET foreign_key_checks = 1;
+
+
 -- Disable foreign key constraints temporarily
 SET foreign_key_checks = 0;
 
 -- Creating Roles Table
-CREATE TABLE roles (
+CREATE TABLE IF NOT EXISTS roles (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     role_name VARCHAR(50) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -10,36 +114,20 @@ CREATE TABLE roles (
 ) ENGINE=InnoDB;
 
 -- Creating Plans Table
-CREATE TABLE plans (
+CREATE TABLE IF NOT EXISTS plans (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     type VARCHAR(50) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- Creating Users Table
-CREATE TABLE users (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    role BIGINT UNSIGNED NOT NULL,
-    student_id BIGINT UNSIGNED DEFAULT NULL,
-    company_id BIGINT UNSIGNED DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (role) REFERENCES roles(id) ON DELETE CASCADE,
-    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
-    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
-
 -- Creating Companies Table
-CREATE TABLE companies (
+CREATE TABLE IF NOT EXISTS companies (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     company_name VARCHAR(255) NOT NULL,
     primary_admin_name VARCHAR(255) NOT NULL,
     primary_admin_email VARCHAR(255) NOT NULL UNIQUE,
-    plan_type BIGINT UNSIGNED,  
+    plan_type BIGINT UNSIGNED DEFAULT NULL,  
     plan_count BIGINT UNSIGNED DEFAULT 0,
     subscribers_count INT DEFAULT 0,
     videos_per_subscriber INT DEFAULT 0,
@@ -54,7 +142,7 @@ CREATE TABLE companies (
 ) ENGINE=InnoDB;
 
 -- Creating Students Table
-CREATE TABLE students (
+CREATE TABLE IF NOT EXISTS students (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     company_id BIGINT UNSIGNED NOT NULL,
@@ -67,8 +155,24 @@ CREATE TABLE students (
     FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+-- Creating Users Table
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role BIGINT UNSIGNED NOT NULL,
+    student_id BIGINT UNSIGNED DEFAULT NULL,
+    company_id BIGINT UNSIGNED DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (role) REFERENCES roles(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- Creating Videos Table
-CREATE TABLE videos (
+CREATE TABLE IF NOT EXISTS videos (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     uploaded_by BIGINT UNSIGNED NOT NULL,
     video_type VARCHAR(50),
@@ -83,19 +187,19 @@ CREATE TABLE videos (
 ) ENGINE=InnoDB;
 
 -- Insert predefined roles
-INSERT INTO roles (role_name) VALUES 
-('superadmin'),
-('admin'),
-('student');
+INSERT INTO roles (role_name) 
+SELECT 'superadmin' UNION ALL SELECT 'admin' UNION ALL SELECT 'student'
+WHERE NOT EXISTS (SELECT 1 FROM roles WHERE role_name IN ('superadmin', 'admin', 'student'));
 
 -- Insert predefined plans
-INSERT INTO plans (type) VALUES 
-('monthly'),
-('annually');
+INSERT INTO plans (type) 
+SELECT 'monthly' UNION ALL SELECT 'annually'
+WHERE NOT EXISTS (SELECT 1 FROM plans WHERE type IN ('monthly', 'annually'));
 
--- Create a default SuperAdmin user
-INSERT INTO users (name, email, password, role) VALUES 
-('Super Admin', 'superadmin@bolsta.com', SHA2('SuperAdmin123!', 256), 1);
+-- Create a default SuperAdmin user if not exists
+INSERT INTO users (name, email, password, role) 
+SELECT 'Super Admin', 'superadmin@bolsta.com', SHA2('SuperAdmin123!', 256), 1
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'superadmin@bolsta.com');
 
 -- Enable foreign key constraints again
 SET foreign_key_checks = 1;
